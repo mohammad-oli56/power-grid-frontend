@@ -1,0 +1,149 @@
+
+"use client";
+
+import React, { useActionState, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+import { Label } from "@/components/ui/label";
+import { Input } from "@base-ui/react";
+import { TPrevState, verifyAction } from "../_action/verifyAccount";
+
+
+
+const initialState: TPrevState = {
+  success: false,
+  message: "",
+};
+
+const VerifyAccount = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const email = searchParams.get("email") || "";
+
+  const [otp, setOtp] = useState("");
+
+  const [state, formAction, isPending] =
+    useActionState(verifyAction, initialState);
+
+  // Redirect after successful verification
+  useEffect(() => {
+    if (state.success) {
+      const timer = setTimeout(() => {
+        router.push("/");
+      }, 1500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [state.success, router]);
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 py-10">
+      <Card className="w-full max-w-md shadow-xl">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">
+            Verify Your Account
+          </CardTitle>
+
+          <CardDescription>
+            We sent a 6-digit OTP to
+            <br />
+
+            <span className="font-semibold text-gray-900">
+              {email || "your email"}
+            </span>
+          </CardDescription>
+        </CardHeader>
+
+        <form action={formAction}>
+          <CardContent className="space-y-5">
+            {/* Email */}
+            <input
+              type="hidden"
+              name="email"
+              value={email}
+            />
+
+            {/* OTP */}
+            <div className="grid gap-2">
+              <Label htmlFor="otp">
+                Enter OTP
+              </Label>
+
+              <Input
+                id="otp"
+                name="otp"
+                type="text"
+                inputMode="numeric"
+                maxLength={6}
+                placeholder="123456"
+                value={otp}
+                onChange={(e) => {
+                  const value = e.target.value
+                    .replace(/\D/g, "")
+                    .slice(0, 6);
+
+                  setOtp(value);
+                }}
+                className="text-center text-xl tracking-[0.5em]"
+                required
+              />
+            </div>
+
+            {/* Message */}
+            {state.message && (
+              <div
+                className={`rounded-lg border p-3 text-center text-sm ${
+                  state.success
+                    ? "border-green-300 bg-green-100 text-green-700"
+                    : "border-red-300 bg-red-100 text-red-700"
+                }`}
+              >
+                {state.message}
+              </div>
+            )}
+          </CardContent>
+
+          <CardFooter className="flex flex-col gap-4">
+            <Button
+              type="submit"
+              disabled={isPending || otp.length !== 6}
+              className="w-full"
+            >
+              {isPending
+                ? "Verifying..."
+                : "Verify OTP"}
+            </Button>
+
+            <p className="text-center text-sm text-gray-500">
+              Didn't receive the OTP?{" "}
+
+              <button
+                type="button"
+                className="font-semibold text-blue-600 hover:underline"
+                onClick={() => {
+                  // Resend OTP will be implemented separately
+                }}
+              >
+                Resend OTP
+              </button>
+            </p>
+          </CardFooter>
+        </form>
+      </Card>
+    </div>
+  );
+};
+
+export default VerifyAccount;
+
