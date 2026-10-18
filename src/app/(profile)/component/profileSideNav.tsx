@@ -10,19 +10,26 @@ import {
   LoaderCircle,
   Menu,
   X,
+  KeyRound,
+  UserRoundPen,
 } from "lucide-react";
 import { logout } from "@/service/logout";
 
 const menuItems = [
   {
-    name: "Reset password",
+    name: "Profile",
+    href: "/profile",
+    icon: User,
+  },
+  {
+    name: "Reset Password",
     href: "/profile/reset-password",
-    icon: CalendarDays,
+    icon: KeyRound,
   },
   {
     name: "Update Profile",
     href: "/profile/update-profile",
-    icon: User,
+    icon: UserRoundPen,
   },
 ];
 
@@ -67,10 +74,11 @@ const ProfileSidebar = () => {
       <nav className="flex-1 space-y-1 p-4">
         {menuItems.map((item) => {
           const Icon = item.icon;
+
           const isActive =
-            pathname === item.href ||
-            (item.href !== "/coustomer-dashboard" &&
-              pathname.startsWith(item.href));
+            item.href === "/profile"
+              ? pathname === "/profile"
+              : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
           return (
             <Link

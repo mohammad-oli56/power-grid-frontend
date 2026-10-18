@@ -1,542 +1,337 @@
+
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
+import { useMe } from "@/hooks/useMe.hooks";
 import {
-  User,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  UserRound,
   Mail,
   Phone,
   MapPin,
+  Hash,
   ShieldCheck,
-  ShieldAlert,
-  Key,
-  Calendar,
+  CalendarDays,
   Clock,
-  Copy,
-  Check,
-  Edit3,
-  CreditCard,
-  Building,
+  Fingerprint,
+  Globe, // Replace Chrome with Globe
+  CircleUserRound,
   CheckCircle2,
   XCircle,
-  AlertCircle,
-  Fingerprint,
-  UserCheck,
-  Globe,
-  Trash2,
-  ExternalLink,
+  Settings2,
 } from "lucide-react";
 
-export interface ProfileData {
-  id: string;
-  name: string;
-  email: string;
-  googleid: string | null;
-  provider: string;
-  accountNumber: string;
-  address: string | null;
-  createdAt: string;
-  deletedAt: string | null;
-  emailVerified: boolean;
-  isActive: boolean;
-  phone: string | null;
-  profilePhoto: string | null;
-  role: string;
-  status: string;
-  updatedAt: string;
-}
+const Mainprofile = () => {
+  const { data, isPending, isError } = useMe();
 
-interface MainprofileProps {
-  data: ProfileData | null;
-  onEditProfile?: () => void;
-}
-
-// Formatters & Utility Functions
-function formatDate(dateString: string | null): string {
-  if (!dateString) return "N/A";
-  try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return "Invalid Date";
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    }).format(date);
-  } catch {
-    return "Invalid Date";
+  if (isPending) {
+    return (
+      <div className="min-h-screen bg-muted/30 p-6">
+        <div className="mx-auto max-w-5xl space-y-6">
+          <div className="h-8 w-48 animate-pulse rounded-lg bg-muted" />
+          <div className="h-52 animate-pulse rounded-2xl bg-muted" />
+          <div className="h-80 animate-pulse rounded-2xl bg-muted" />
+        </div>
+      </div>
+    );
   }
-}
 
-function CopyableText({ text, label }: { text: string; label?: string }) {
-  const [copied, setCopied] = useState(false);
+  if (isError || !data?.data) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center p-6">
+        <Card className="w-full max-w-md">
+          <CardContent className="flex flex-col items-center gap-3 p-8 text-center">
+            <XCircle className="size-12 text-destructive" />
+            <h2 className="text-xl font-semibold">Unable to load profile</h2>
+            <p className="text-sm text-muted-foreground">
+              Something went wrong while fetching your account information.
+              Please try again later.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Fallback or handle copy error gracefully
-    }
+  const profile = data.data;
+
+  const initials =
+    profile.name
+      ?.split(" ")
+      .filter(Boolean)
+      .map((part: string) => part[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "U";
+
+  const formatDate = (date?: string | null) => {
+    if (!date) return "Not available";
+
+    const parsed = new Date(date);
+
+    if (Number.isNaN(parsed.getTime())) return "Not available";
+
+    return parsed.toLocaleString(undefined, {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
   };
 
-  return (
-    <div className="flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 transition-colors hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900/50 dark:hover:bg-slate-800/50">
-      <div className="min-w-0 flex-1">
-        {label && (
-          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-            {label}
-          </p>
-        )}
-        <p className="truncate font-mono text-sm font-semibold text-slate-800 dark:text-slate-200">
-          {text}
-        </p>
-      </div>
-      <button
-        onClick={handleCopy}
-        type="button"
-        aria-label="Copy to clipboard"
-        className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
-      >
-        {copied ? (
-          <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-        ) : (
-          <Copy className="h-4 w-4" />
-        )}
-      </button>
-    </div>
-  );
-}
-
-function StatusBadge({
-  isActive,
-  isDeleted,
-  status,
-}: {
-  isActive: boolean;
-  isDeleted: boolean;
-  status: string;
-}) {
-  if (isDeleted) {
-    return (
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-xs font-medium text-rose-700 ring-1 ring-inset ring-rose-600/20 dark:bg-rose-950/40 dark:text-rose-400 dark:ring-rose-500/30">
-        <Trash2 className="h-3.5 w-3.5" />
-        Account Deleted
-      </span>
-    );
-  }
-
-  if (!isActive || status.toLowerCase() === "inactive") {
-    return (
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20 dark:bg-amber-950/40 dark:text-amber-400 dark:ring-amber-500/30">
-        <AlertCircle className="h-3.5 w-3.5" />
-        Inactive
-      </span>
-    );
-  }
+  const details = [
+    {
+      label: "Full name",
+      value: profile.name,
+      icon: UserRound,
+    },
+    {
+      label: "Email address",
+      value: profile.email,
+      icon: Mail,
+    },
+    {
+      label: "Phone number",
+      value: profile.phone,
+      icon: Phone,
+    },
+    {
+      label: "Address",
+      value: profile.address,
+      icon: MapPin,
+    },
+    {
+      label: "Account number",
+      value: profile.accountNumber,
+      icon: Hash,
+    },
+    {
+      label: "Authentication provider",
+      value: profile.provider,
+     icon: Globe,
+    },
+    {
+      label: "Google ID",
+      value: profile.googleid,
+      icon: Fingerprint,
+    },
+  ];
 
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20 dark:bg-emerald-950/40 dark:text-emerald-400 dark:ring-emerald-500/30">
-      <CheckCircle2 className="h-3.5 w-3.5" />
-      Active
-    </span>
-  );
-}
-
-// Skeleton Loader Component
-export function ProfileSkeleton() {
-  return (
-    <div className="mx-auto max-w-6xl animate-pulse space-y-6 p-4 sm:p-6 lg:p-8">
-      {/* Header Skeleton */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
-          <div className="h-24 w-24 rounded-full bg-slate-200 dark:bg-slate-800" />
-          <div className="flex-1 space-y-3 text-center sm:text-left">
-            <div className="h-7 w-48 rounded bg-slate-200 dark:bg-slate-800" />
-            <div className="h-4 w-64 rounded bg-slate-200 dark:bg-slate-800" />
-            <div className="flex justify-center gap-2 sm:justify-start">
-              <div className="h-6 w-20 rounded-full bg-slate-200 dark:bg-slate-800" />
-              <div className="h-6 w-24 rounded-full bg-slate-200 dark:bg-slate-800" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Grid Skeleton */}
-      
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="h-64 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900" />
-        <div className="h-64 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900" />
-      </div>
-    </div>
-  );
-}
-
-// Main Component
-export default function Mainprofile({ data, onEditProfile }: MainprofileProps) {
-  if (!data) {
-    return <ProfileSkeleton />;
-  }
-
-  const isDeleted = Boolean(data.deletedAt);
-
-  return (
-    <div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6 lg:p-8">
-      {/* 1. Header Section */}
-      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-center">
-            {/* Avatar / Photo */}
-            <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-2 border-white shadow-md ring-2 ring-slate-200 dark:border-slate-800 dark:ring-slate-700">
-              {data.profilePhoto ? (
-                <img
-                  src={data.profilePhoto}
-                  alt={data.name || "User Avatar"}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 text-2xl font-bold text-white">
-                  {data.name ? data.name.charAt(0).toUpperCase() : "U"}
-                </div>
-              )}
-            </div>
-
-            {/* Profile Brief info */}
-            <div className="space-y-1.5 text-center sm:text-left">
-              <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-                <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-                  {data.name || "Unnamed User"}
-                </h1>
-                <StatusBadge
-                  isActive={data.isActive}
-                  isDeleted={isDeleted}
-                  status={data.status}
-                />
-              </div>
-
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                {data.email}
-              </p>
-
-              <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-xs text-slate-600 sm:justify-start dark:text-slate-300">
-                <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2.5 py-1 font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-300">
-                  <UserCheck className="h-3.5 w-3.5 text-blue-500" />
-                  Role: <span className="capitalize">{data.role}</span>
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2.5 py-1 font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-300">
-                  <Globe className="h-3.5 w-3.5 text-indigo-500" />
-                  Provider: <span className="capitalize">{data.provider}</span>
-                </span>
-              </div>
-            </div>
+    <main className="min-h-screen bg-muted/30 px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl space-y-6">
+        {/* Page heading */}
+        <div className="flex items-center gap-3">
+          <div className="rounded-xl bg-primary/10 p-3">
+            <CircleUserRound className="size-6 text-primary" />
           </div>
 
-          {/* Edit Profile Action */}
-          {onEditProfile && (
-            <button
-              onClick={onEditProfile}
-              type="button"
-              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
-            >
-              <Edit3 className="h-4 w-4" />
-              Edit Profile
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* 2. Account Overview Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Account Number Card */}
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Account No.
-            </span>
-            <div className="rounded-lg bg-blue-50 p-2 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400">
-              <CreditCard className="h-5 w-5" />
-            </div>
-          </div>
-          <p className="mt-3 font-mono text-lg font-bold text-slate-900 dark:text-white">
-            {data.accountNumber || "N/A"}
-          </p>
-        </div>
-
-        {/* Email Verification Card */}
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Email Status
-            </span>
-            <div
-              className={`rounded-lg p-2 ${
-                data.emailVerified
-                  ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400"
-                  : "bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400"
-              }`}
-            >
-              {data.emailVerified ? (
-                <ShieldCheck className="h-5 w-5" />
-              ) : (
-                <ShieldAlert className="h-5 w-5" />
-              )}
-            </div>
-          </div>
-          <p className="mt-3 text-lg font-bold text-slate-900 dark:text-white">
-            {data.emailVerified ? "Verified" : "Unverified"}
-          </p>
-        </div>
-
-        {/* Authentication Provider Card */}
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Auth Provider
-            </span>
-            <div className="rounded-lg bg-indigo-50 p-2 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
-              <Key className="h-5 w-5" />
-            </div>
-          </div>
-          <p className="mt-3 text-lg font-bold capitalize text-slate-900 dark:text-white">
-            {data.provider || "Standard"}
-          </p>
-        </div>
-
-        {/* Account State Card */}
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Account Status
-            </span>
-            <div className="rounded-lg bg-purple-50 p-2 text-purple-600 dark:bg-purple-950/50 dark:text-purple-400">
-              <Building className="h-5 w-5" />
-            </div>
-          </div>
-          <p className="mt-3 text-lg font-bold capitalize text-slate-900 dark:text-white">
-            {data.status || "Unknown"}
-          </p>
-        </div>
-      </div>
-
-      {/* Grid: Information & Account Details */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* 3. Personal Information Section */}
-        <div className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <div>
-            <div className="mb-6 flex items-center gap-2 border-b border-slate-100 pb-4 dark:border-slate-800">
-              <User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                Personal Information
-              </h2>
-            </div>
-
-            <div className="space-y-4">
-              {/* Full Name */}
-              <div className="flex items-start gap-3">
-                <User className="mt-1 h-4 w-4 shrink-0 text-slate-400" />
-                <div className="flex-1">
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                    Full Name
-                  </p>
-                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                    {data.name || "Not provided"}
-                  </p>
-                </div>
-              </div>
-
-              {/* Email Address */}
-              <div className="flex items-start gap-3">
-                <Mail className="mt-1 h-4 w-4 shrink-0 text-slate-400" />
-                <div className="flex-1">
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                    Email Address
-                  </p>
-                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                    {data.email || "Not provided"}
-                  </p>
-                </div>
-              </div>
-
-              {/* Phone Number */}
-              <div className="flex items-start gap-3">
-                <Phone className="mt-1 h-4 w-4 shrink-0 text-slate-400" />
-                <div className="flex-1">
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                    Phone Number
-                  </p>
-                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                    {data.phone || "Not provided"}
-                  </p>
-                </div>
-              </div>
-
-              {/* Address */}
-              <div className="flex items-start gap-3">
-                <MapPin className="mt-1 h-4 w-4 shrink-0 text-slate-400" />
-                <div className="flex-1">
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                    Address
-                  </p>
-                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                    {data.address || "Not provided"}
-                  </p>
-                </div>
-              </div>
-
-              {/* Profile Photo Status */}
-              <div className="flex items-start gap-3">
-                <ExternalLink className="mt-1 h-4 w-4 shrink-0 text-slate-400" />
-                <div className="flex-1">
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                    Profile Picture Status
-                  </p>
-                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                    {data.profilePhoto ? "Custom Photo Uploaded" : "Default Avatar"}
-                  </p>
-                </div>
-              </div>
-            </div>
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+              My Profile
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Manage and view your personal account information.
+            </p>
           </div>
         </div>
 
-        {/* 4. Account Details Section */}
-        <div className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <div>
-            <div className="mb-6 flex items-center gap-2 border-b border-slate-100 pb-4 dark:border-slate-800">
-              <Fingerprint className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                Technical & System Details
-              </h2>
+        {/* Profile hero card */}
+        <Card className="overflow-hidden border-border/60 shadow-sm">
+          <div className="h-28 bg-gradient-to-r from-primary/80 via-primary/50 to-violet-500/60 sm:h-36" />
+
+          <CardContent className="relative px-5 pb-6 sm:px-8">
+            <div className="-mt-12 flex flex-col gap-4 sm:-mt-14 sm:flex-row sm:items-end sm:justify-between">
+              <div className="flex items-end gap-4">
+                <Avatar className="size-24 border-4 border-background shadow-md sm:size-28">
+                  <AvatarImage
+                    src={profile.profilePhoto || undefined}
+                    alt={profile.name || "User"}
+                  />
+                  <AvatarFallback className="bg-primary text-2xl font-bold text-primary-foreground">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+
+                <div className="pb-1">
+                  <h2 className="text-xl font-bold sm:text-2xl">
+                    {profile.name || "Unnamed user"}
+                  </h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {profile.email || "No email provided"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2 sm:pb-1">
+                <Badge
+                  variant={profile.isActive ? "default" : "destructive"}
+                  className="gap-1 rounded-full px-3 py-1"
+                >
+                  {profile.isActive ? (
+                    <CheckCircle2 className="size-3.5" />
+                  ) : (
+                    <XCircle className="size-3.5" />
+                  )}
+                  {profile.isActive ? "Active" : "Inactive"}
+                </Badge>
+
+                <Badge
+                  variant="secondary"
+                  className="rounded-full px-3 py-1"
+                >
+                  {profile.role || "CUSTOMER"}
+                </Badge>
+              </div>
             </div>
 
-            <div className="space-y-4">
-              {/* User ID */}
-              <CopyableText label="User System ID" text={data.id} />
+            <Separator className="my-6" />
 
-              {/* Account Number Copyable */}
-              <CopyableText
-                label="Account Reference Number"
-                text={data.accountNumber}
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="flex items-center gap-3 rounded-xl bg-muted/50 p-4">
+                <div className="rounded-lg bg-background p-2.5 shadow-sm">
+                  <ShieldCheck className="size-5 text-primary" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-muted-foreground">
+                    Email verification
+                  </p>
+                  <p className="font-semibold">
+                    {profile.emailVerified ? "Verified" : "Not verified"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 rounded-xl bg-muted/50 p-4">
+                <div className="rounded-lg bg-background p-2.5 shadow-sm">
+                  <CalendarDays className="size-5 text-primary" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-muted-foreground">
+                    Member since
+                  </p>
+                  <p className="truncate font-semibold">
+                    {profile.createdAt
+                      ? new Date(profile.createdAt).toLocaleDateString(
+                          undefined,
+                          { dateStyle: "medium" }
+                        )
+                      : "Not available"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 rounded-xl bg-muted/50 p-4">
+                <div className="rounded-lg bg-background p-2.5 shadow-sm">
+                  <Settings2 className="size-5 text-primary" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-muted-foreground">
+                    Account status
+                  </p>
+                  <p className="font-semibold">
+                    {profile.status || "Unknown"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Personal information */}
+        <Card className="border-border/60 shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <UserRound className="size-5 text-primary" />
+              Personal Information
+            </CardTitle>
+            <CardDescription>
+              Your personal details associated with this account.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent>
+            <div className="grid gap-x-8 sm:grid-cols-2">
+              {details.map(({ label, value, icon: Icon }, index) => (
+                <div key={label}>
+                  <div className="flex min-w-0 items-start gap-3 py-4">
+                    <div className="mt-0.5 rounded-lg bg-muted p-2.5">
+                      <Icon className="size-4 text-muted-foreground" />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm text-muted-foreground">
+                        {label}
+                      </p>
+                      <p className="mt-1 break-all text-sm font-medium">
+                        {value ?? "Not provided"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {index < details.length - 1 && (
+                    <Separator className="sm:hidden" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Account metadata */}
+        <Card className="border-border/60 shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Clock className="size-5 text-primary" />
+              Account Activity
+            </CardTitle>
+            <CardDescription>
+              Important dates associated with your account.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent>
+            <div className="grid gap-5 sm:grid-cols-3">
+              <DateItem
+                label="Account created"
+                date={formatDate(profile.createdAt)}
               />
-
-              {/* System Identifiers Grid */}
-              <div className="grid grid-cols-2 gap-4 pt-2">
-                <div>
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                    Google ID
-                  </p>
-                  <p className="truncate font-mono text-xs font-semibold text-slate-800 dark:text-slate-200">
-                    {data.googleid ? data.googleid : "Not linked"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                    Role Privilege
-                  </p>
-                  <p className="text-xs font-semibold capitalize text-slate-800 dark:text-slate-200">
-                    {data.role}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                    System Active
-                  </p>
-                  <div className="mt-0.5 flex items-center gap-1.5 text-xs font-medium text-slate-800 dark:text-slate-200">
-                    {data.isActive ? (
-                      <>
-                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-                        Yes
-                      </>
-                    ) : (
-                      <>
-                        <XCircle className="h-3.5 w-3.5 text-rose-500" />
-                        No
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                    Email Verification Status
-                  </p>
-                  <div className="mt-0.5 flex items-center gap-1.5 text-xs font-medium text-slate-800 dark:text-slate-200">
-                    {data.emailVerified ? (
-                      <>
-                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-                        Verified
-                      </>
-                    ) : (
-                      <>
-                        <XCircle className="h-3.5 w-3.5 text-amber-500" />
-                        Unverified
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <DateItem
+                label="Last updated"
+                date={formatDate(profile.updatedAt)}
+              />
+              <DateItem
+                label="Deleted at"
+                date={formatDate(profile.deletedAt)}
+              />
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
+    </main>
+  );
+};
 
-      {/* 5. Account Activity & Timestamp Section */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <div className="mb-6 flex items-center gap-2 border-b border-slate-100 pb-4 dark:border-slate-800">
-          <Clock className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-            Account Timeline & Activity
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Created Date */}
-          <div className="flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-800/30">
-            <Calendar className="mt-0.5 h-5 w-5 shrink-0 text-blue-500" />
-            <div>
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                Account Created
-              </p>
-              <p className="mt-1 text-sm font-semibold text-slate-800 dark:text-slate-200">
-                {formatDate(data.createdAt)}
-              </p>
-            </div>
-          </div>
-
-          {/* Updated Date */}
-          <div className="flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-800/30">
-            <Clock className="mt-0.5 h-5 w-5 shrink-0 text-indigo-500" />
-            <div>
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                Last Updated
-              </p>
-              <p className="mt-1 text-sm font-semibold text-slate-800 dark:text-slate-200">
-                {formatDate(data.updatedAt)}
-              </p>
-            </div>
-          </div>
-
-          {/* Deleted Date (Conditional Display) */}
-          {data.deletedAt && (
-            <div className="flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50/50 p-4 dark:border-rose-900/50 dark:bg-rose-950/20">
-              <Trash2 className="mt-0.5 h-5 w-5 shrink-0 text-rose-500" />
-              <div>
-                <p className="text-xs font-medium text-rose-600 dark:text-rose-400">
-                  Account Deleted On
-                </p>
-                <p className="mt-1 text-sm font-semibold text-rose-900 dark:text-rose-200">
-                  {formatDate(data.deletedAt)}
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+function DateItem({
+  label,
+  date,
+}: {
+  label: string;
+  date: string;
+}) {
+  return (
+    <div className="rounded-xl border bg-card p-4">
+      <p className="text-sm text-muted-foreground">{label}</p>
+      <p className="mt-2 break-words text-sm font-semibold">{date}</p>
     </div>
   );
 }
+
+export default Mainprofile;
