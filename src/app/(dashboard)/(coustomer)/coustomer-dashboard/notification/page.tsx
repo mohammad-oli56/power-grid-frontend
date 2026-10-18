@@ -1,9 +1,10 @@
 import React from 'react'
+import AllNotificationPage from '../../Components/AllNotificationPage'
 
 const page = () => {
   return (
     <div>
-      this notification
+      <AllNotificationPage></AllNotificationPage>
     </div>
   )
 }

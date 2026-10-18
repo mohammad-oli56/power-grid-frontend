@@ -12,7 +12,7 @@ export default function ProfileLayout({
     <div className="flex min-h-screen flex-col md:flex-row">
       {/* Sidebar */}
       <aside className="w-full shrink-0 border-b border-gray-200 bg-white md:min-h-screen md:w-56 md:border-b-0 md:border-r lg:w-64">
-       <CustomerSidebar></CustomerSidebar>
+        <CustomerSidebar></CustomerSidebar>
       </aside>
 
       {/* Main Content */}

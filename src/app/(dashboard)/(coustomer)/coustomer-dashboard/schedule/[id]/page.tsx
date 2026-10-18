@@ -3,7 +3,7 @@ import React from 'react'
 const page = () => {
   return (
     <div>
-      this this profile
+      this is single schedule
     </div>
   )
 }
