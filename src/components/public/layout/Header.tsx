@@ -7,7 +7,7 @@ import { DropdownMenuDemo } from "./Deopdown";
 
 const Header = async () => {
   const user = await getMe();
-console.log(user.data)
+// console.log(user.data)
   const routes = [
     { name: "Home", url: "/" },
     { name: "Features", url: "/features" },

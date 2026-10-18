@@ -45,7 +45,7 @@ export default function LoginForm() {
 
       login(loginData, {
         onSuccess: (data) => {
-          console.log("Login successful:", data);
+          // console.log("Login successful:", data);
 
           // Example:
           router.push("/");

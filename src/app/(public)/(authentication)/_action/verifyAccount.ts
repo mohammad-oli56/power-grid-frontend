@@ -62,7 +62,7 @@ export async function verifyAction(
       }
     );
 
-    console.log("VERIFY OTP RESPONSE:", response.data);
+    // console.log("VERIFY OTP RESPONSE:", response.data);
 
     // -----------------------------
     // Get Tokens

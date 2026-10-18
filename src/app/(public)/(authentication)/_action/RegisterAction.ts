@@ -91,7 +91,7 @@ export const registerAction = async (
       }
     );
 
-    console.log("REGISTER RESPONSE:", response.data);
+    // console.log("REGISTER RESPONSE:", response.data);
 
     return {
       success: true,
