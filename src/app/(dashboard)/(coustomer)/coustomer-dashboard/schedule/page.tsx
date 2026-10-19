@@ -1,5 +1,5 @@
 import React from 'react'
-import AllSchedulePage from '../../Components/AllSchedulePage'
+import AllSchedulePage from '../../_Components/AllSchedulePage'
 
 const page = () => {
   return (

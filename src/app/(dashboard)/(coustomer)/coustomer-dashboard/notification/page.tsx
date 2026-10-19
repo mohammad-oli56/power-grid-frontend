@@ -1,5 +1,5 @@
 import React from 'react'
-import AllNotificationPage from '../../Components/AllNotificationPage'
+import AllNotificationPage from '../../_Components/AllNotificationPage'
 
 const page = () => {
   return (

@@ -1,6 +1,6 @@
 
 import { ReactNode } from "react";
-import CustomerSidebar from "./Components/CustomerSidebar";
+import CustomerSidebar from "./_Components/CustomerSidebar";
 
 
 export default function ProfileLayout({
