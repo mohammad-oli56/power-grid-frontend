@@ -1,5 +1,6 @@
 
 import { ReactNode } from "react";
+import PoweroperatorSidebar from "./_conponent/PowerOperatorSideNav";
 
 
 
@@ -13,7 +14,7 @@ export default function ProfileLayout({
     <div className="flex min-h-screen flex-col md:flex-row">
       {/* Sidebar */}
       <aside className="w-full shrink-0 border-b border-gray-200 bg-white md:min-h-screen md:w-56 md:border-b-0 md:border-r lg:w-64">
-       
+       <PoweroperatorSidebar></PoweroperatorSidebar>
       </aside>
 
       {/* Main Content */}

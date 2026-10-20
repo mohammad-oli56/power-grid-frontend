@@ -78,7 +78,7 @@ export async function loginAction(
         break;
 
       case "POWER_OPERATOR":
-        redirectPath = "/landlord-dashboard";
+        redirectPath = "/power-operator-dashboard";
         break;
 
       case "TECHNICIAN":

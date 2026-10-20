@@ -49,18 +49,20 @@ export function DropdownMenuDemo({ user }: { user: User }) {
     }
   };
 
-  const handleDashboard = () => {
-    const dashboardPath =
-      user.role === "ADMIN"
-        ? "/admin-dashboard"
-        : user.role === "TECHNICIAN"
-          ? "/technician-dashboard"
-          : user.role === "CUSTOMER"
-            ? "/coustomer-dashboard"
+const handleDashboard = () => {
+  const dashboardPath =
+    user.role === "ADMIN"
+      ? "/admin-dashboard"
+      : user.role === "TECHNICIAN"
+        ? "/technician-dashboard"
+        : user.role === "CUSTOMER"
+          ? "/coustomer-dashboard"
+          : user.role === "POWER_OPERATOR"
+            ? "/power-operator-dashboard"
             : "/";
 
-    router.push(dashboardPath);
-  };
+  router.push(dashboardPath);
+};
 
   const handleProfile = () => {
     router.push("/profile");
