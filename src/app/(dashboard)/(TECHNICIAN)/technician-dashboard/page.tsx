@@ -1,9 +1,10 @@
 import React from 'react'
+import TechnicianHomepage from '../_component/TechnicianHomepahe'
 
 const page = () => {
   return (
     <div>
-      this is technician dahsboard
+     <TechnicianHomepage></TechnicianHomepage>
     </div>
   )
 }

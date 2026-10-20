@@ -2,10 +2,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-
 import {
   CalendarDays,
   Wrench,
@@ -14,6 +13,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
+import { logout } from "@/service/logout";
 
 const menuItems = [
   {
@@ -35,7 +35,31 @@ const menuItems = [
 
 export default function TechnicianSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState("");
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+
+    try {
+      setIsLoggingOut(true);
+      setLogoutError("");
+
+      await logout();
+
+      // Logout successful হলে login page-এ যাবে
+      router.replace("/login");
+      router.refresh();
+    } catch (error) {
+      console.error("Logout failed:", error);
+      setLogoutError("Logout failed. Please try again.");
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   const SidebarContent = () => (
     <div className="flex h-full flex-col bg-white">
@@ -88,15 +112,18 @@ export default function TechnicianSidebar() {
 
       {/* Logout */}
       <div className="border-t p-4">
+        {logoutError && (
+          <p className="mb-3 text-sm text-red-600">{logoutError}</p>
+        )}
+
         <button
           type="button"
-          onClick={() => {
-            // Add your logout logic here
-          }}
-          className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-red-600 transition-colors hover:bg-red-50"
+          disabled={isLoggingOut}
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <LogOut size={20} />
-          <span>Logout</span>
+          <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
         </button>
       </div>
     </div>
