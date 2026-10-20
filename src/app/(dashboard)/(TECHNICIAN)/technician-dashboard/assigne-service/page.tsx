@@ -1,9 +1,10 @@
 import React from 'react'
+import TechnicianServices from '../../_component/TechnicianServices'
 
 const page = () => {
   return (
     <div>
-      this is assigne service
+     <TechnicianServices></TechnicianServices>
     </div>
   )
 }
