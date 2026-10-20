@@ -1,9 +1,12 @@
 import React from 'react'
+import TechnicianOutage from '../../_component/TechnicianOutage'
+
+
 
 const page = () => {
   return (
     <div>
-      this is assigne Outage
+      <TechnicianOutage></TechnicianOutage>
     </div>
   )
 }

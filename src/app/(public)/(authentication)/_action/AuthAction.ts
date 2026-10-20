@@ -82,7 +82,7 @@ export async function loginAction(
         break;
 
       case "TECHNICIAN":
-        redirectPath = "/tenant-dashboard";
+        redirectPath = "/technician-dashboard";
         break;
 
          case "CUSTOMER":

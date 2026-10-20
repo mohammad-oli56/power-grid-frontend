@@ -30,8 +30,8 @@ export function DropdownMenuDemo({ user }: { user: User }) {
     const dashboardPath =
       user.role === "ADMIN"
         ? "/admin-dashboard"
-        : user.role === "LANDLORD"
-          ? "/landlord-dashboard"
+        : user.role === "TECHNICIAN"
+          ? "/technician-dashboard"
           : user.role === "CUSTOMER"
             ? "/coustomer-dashboard"
             : "/";
