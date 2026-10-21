@@ -1,3 +1,6 @@
+import { assigneTechnician } from "@/app/(dashboard)/(PowerOperatoor)/_action/assignTechnician";
+import { cancelOutageComplain } from "@/app/(dashboard)/(PowerOperatoor)/_action/cancelOutageComplain";
+import { updatOutageStatusComplain } from "@/app/(dashboard)/(PowerOperatoor)/_action/changeStatusComplainOutage";
 import { createSchedule } from "@/app/(dashboard)/(PowerOperatoor)/_action/createSchedule";
 import { createZone } from "@/app/(dashboard)/(PowerOperatoor)/_action/createZone";
 import { deleteShdedule } from "@/app/(dashboard)/(PowerOperatoor)/_action/deleteSchedule";
@@ -5,6 +8,7 @@ import { getOutageComplain } from "@/app/(dashboard)/(PowerOperatoor)/_action/ge
 import { getAllSchedules } from "@/app/(dashboard)/(PowerOperatoor)/_action/getAllSchedule";
 
 import { getAllZone } from "@/app/(dashboard)/(PowerOperatoor)/_action/getAllZone";
+import { getsingleSingleOutageProblem } from "@/app/(dashboard)/(PowerOperatoor)/_action/getSingleOutageComplain";
 import { getsingleSchedulePowerOperator } from "@/app/(dashboard)/(PowerOperatoor)/_action/getSingleSchedule";
 import { getAllTechnician } from "@/app/(dashboard)/(PowerOperatoor)/_action/technicians";
 import { updatShceduleTime } from "@/app/(dashboard)/(PowerOperatoor)/_action/updateScheduleTime";
@@ -13,8 +17,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 export function useZone() {
   return useQuery({
     queryKey: ["zonepoweroperator"],
-    queryFn:  getAllZone,
-    
+    queryFn: getAllZone,
+
     staleTime: 10 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
@@ -40,7 +44,7 @@ export function useCreateZones() {
 
 export function useTechnicianGet() {
   return useQuery({
-  queryKey: ["technicianpoweroperator"],
+    queryKey: ["technicianpoweroperator"],
     queryFn: getAllTechnician,
     staleTime: 10 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
@@ -83,38 +87,38 @@ export function useScheduleSingleGetPowerOperator(id: string) {
 }
 
 type UpdateScheduleTimePayload = {
-startTime: string;
-endTime: string;
+  startTime: string;
+  endTime: string;
 };
 
 export function useUpdateScheduleTime(id: string) {
-const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-return useMutation({
-mutationFn: (time: UpdateScheduleTimePayload) =>
-updatShceduleTime(id, time),
+  return useMutation({
+    mutationFn: (time: UpdateScheduleTimePayload) =>
+      updatShceduleTime(id, time),
 
-onSuccess: async () => {
-  await Promise.all([
-    queryClient.invalidateQueries({
-      queryKey: ["schedulePowerOperator", id],
-    }),
-    queryClient.invalidateQueries({
-      queryKey: ["schedulePowerOperator"],
-    }),
-  ]);
-},
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["schedulePowerOperator", id],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["schedulePowerOperator"],
+        }),
+      ]);
+    },
 
-});
+  });
 }
 
 
 
-export const useDeleteSchedule = (id:string) => {
+export const useDeleteSchedule = (id: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn:()=> deleteShdedule(id),
+    mutationFn: () => deleteShdedule(id),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["schedulespoweroprator"],
@@ -126,11 +130,89 @@ export const useDeleteSchedule = (id:string) => {
 
 
 
-export const useOutageComplain =()=>{
+export const useOutageComplain = () => {
   return useQuery({
-    queryKey:["OutageComplain"],
-    queryFn:getOutageComplain,
-     staleTime: 10 * 60 * 1000,
+    queryKey: ["OutageComplain"],
+    queryFn: getOutageComplain,
+    staleTime: 10 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   })
+}
+
+
+
+export function useSingleOutageComplain(id: string) {
+  return useQuery({
+    queryKey: ["OutageComplain", id],
+    queryFn: () => getsingleSingleOutageProblem(id),
+    staleTime: 10 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    enabled: !!id,
+  });
+}
+
+
+export function useOutageStatusChange(id: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () =>
+      updatOutageStatusComplain(id),
+
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["OutageComplain", id],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["OutageComplain"],
+        }),
+      ]);
+    },
+
+  });
+}
+
+
+export function useAssigneTechnician(id: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (technicianId: string) =>
+      assigneTechnician(id, technicianId),
+
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["OutageComplain", id],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["OutageComplain"],
+        }),
+      ]);
+    },
+
+  });
+}
+
+
+export function useCancelOutageComplain(id: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () =>
+      cancelOutageComplain(id),
+
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["OutageComplain", id],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["OutageComplain"],
+        }),
+      ]);
+    },
+
+  });
 }
