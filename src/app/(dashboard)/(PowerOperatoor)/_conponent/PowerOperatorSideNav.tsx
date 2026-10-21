@@ -41,6 +41,12 @@ const menuItems = [
     href: "/power-operator-dashboard/schedules",
     icon: Bell,
   },
+  {
+    name: "Outage Complains",
+    href: "/power-operator-dashboard/outage-complains",
+    icon: Bell,
+  },
+
 ];
 
 export default function PoweroperatorSidebar() {

@@ -1,6 +1,7 @@
 import { createSchedule } from "@/app/(dashboard)/(PowerOperatoor)/_action/createSchedule";
 import { createZone } from "@/app/(dashboard)/(PowerOperatoor)/_action/createZone";
 import { deleteShdedule } from "@/app/(dashboard)/(PowerOperatoor)/_action/deleteSchedule";
+import { getOutageComplain } from "@/app/(dashboard)/(PowerOperatoor)/_action/getAllOutageComplains";
 import { getAllSchedules } from "@/app/(dashboard)/(PowerOperatoor)/_action/getAllSchedule";
 
 import { getAllZone } from "@/app/(dashboard)/(PowerOperatoor)/_action/getAllZone";
@@ -121,3 +122,15 @@ export const useDeleteSchedule = (id:string) => {
     },
   });
 };
+
+
+
+
+export const useOutageComplain =()=>{
+  return useQuery({
+    queryKey:["OutageComplain"],
+    queryFn:getOutageComplain,
+     staleTime: 10 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  })
+}
