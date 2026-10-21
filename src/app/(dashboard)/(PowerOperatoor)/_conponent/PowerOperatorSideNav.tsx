@@ -31,6 +31,16 @@ const menuItems = [
     href: "/power-operator-dashboard/technicians",
     icon: Bell,
   },
+   {
+    name: "Create Schedule",
+    href: "/power-operator-dashboard/create-schedule",
+    icon: Bell,
+  },
+  {
+    name: "Schedule",
+    href: "/power-operator-dashboard/schedules",
+    icon: Bell,
+  },
 ];
 
 export default function PoweroperatorSidebar() {
