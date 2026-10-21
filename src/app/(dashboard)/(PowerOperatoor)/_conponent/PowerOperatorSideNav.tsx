@@ -46,6 +46,11 @@ const menuItems = [
     href: "/power-operator-dashboard/outage-complains",
     icon: Bell,
   },
+   {
+    name: "Service request",
+    href: "/power-operator-dashboard/services-request",
+    icon: Bell,
+  },
 
 ];
 

@@ -6,10 +6,12 @@ import { createZone } from "@/app/(dashboard)/(PowerOperatoor)/_action/createZon
 import { deleteShdedule } from "@/app/(dashboard)/(PowerOperatoor)/_action/deleteSchedule";
 import { getOutageComplain } from "@/app/(dashboard)/(PowerOperatoor)/_action/getAllOutageComplains";
 import { getAllSchedules } from "@/app/(dashboard)/(PowerOperatoor)/_action/getAllSchedule";
+import { getAllServiceRequest } from "@/app/(dashboard)/(PowerOperatoor)/_action/getAllServiceRequest";
 
 import { getAllZone } from "@/app/(dashboard)/(PowerOperatoor)/_action/getAllZone";
 import { getsingleSingleOutageProblem } from "@/app/(dashboard)/(PowerOperatoor)/_action/getSingleOutageComplain";
 import { getsingleSchedulePowerOperator } from "@/app/(dashboard)/(PowerOperatoor)/_action/getSingleSchedule";
+import { getSingleServiceRequest } from "@/app/(dashboard)/(PowerOperatoor)/_action/getSingleServiceRequest";
 import { getAllTechnician } from "@/app/(dashboard)/(PowerOperatoor)/_action/technicians";
 import { updatShceduleTime } from "@/app/(dashboard)/(PowerOperatoor)/_action/updateScheduleTime";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -214,5 +216,27 @@ export function useCancelOutageComplain(id: string) {
       ]);
     },
 
+  });
+}
+
+
+
+export const useServiceRequest = () => {
+  return useQuery({
+    queryKey: ["servicerequest"],
+    queryFn: getAllServiceRequest,
+    staleTime: 10 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  })
+}
+
+
+export function useSingleServiceRequest(id: string) {
+  return useQuery({
+    queryKey: ["servicerequest", id],
+    queryFn: () => getSingleServiceRequest(id),
+    staleTime: 10 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    enabled: !!id,
   });
 }
