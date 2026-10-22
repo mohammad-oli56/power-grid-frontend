@@ -16,41 +16,23 @@ import {
 import { logout } from "@/service/logout";
 
 const menuItems = [
-  {
-    name: "Create Zone",
-    href: "/power-operator-dashboard/create-zone",
+   {
+    name: "Admin Home",
+    href: "/admin-dashboard/",
     icon: CalendarDays,
   },
   {
-    name: "Zones",
-    href: "/power-operator-dashboard/zones",
+    name: "All users",
+    href: "/admin-dashboard/all-users",
+    icon: CalendarDays,
+  },
+  {
+    name: "Audit Logs",
+    href: "/admin-dashboard/audit-logs",
     icon: Wrench,
   },
-  {
-    name: "Technicians",
-    href: "/power-operator-dashboard/technicians",
-    icon: Bell,
-  },
-   {
-    name: "Create Schedule",
-    href: "/power-operator-dashboard/create-schedule",
-    icon: Bell,
-  },
-  {
-    name: "Schedule",
-    href: "/power-operator-dashboard/schedules",
-    icon: Bell,
-  },
-  {
-    name: "Outage Complains",
-    href: "/power-operator-dashboard/outage-complains",
-    icon: Bell,
-  },
-   {
-    name: "Service request",
-    href: "/power-operator-dashboard/services-request",
-    icon: Bell,
-  },
+  
+ 
 
 ];
 
