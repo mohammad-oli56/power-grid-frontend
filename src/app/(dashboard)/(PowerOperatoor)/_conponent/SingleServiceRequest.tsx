@@ -1,8 +1,15 @@
 "use client";
 
-import { useSingleServiceRequest } from "@/hooks/poweroperator.hooks";
+import { Button } from "@/components/ui/button";
+import {
+  useCancelServiceRequest,
+  useChangeStatusServiceRequest,
+  useSingleServiceRequest,
+} from "@/hooks/poweroperator.hooks";
 import { useParams } from "next/navigation";
 import React from "react";
+import { AssignTechnicianModal } from "./AssignTechnicianModal";
+import { AssignTechnicianServiceModal } from "./AssignTechnicianServiceModel";
 
 type DetailProps = {
   label: string;
@@ -14,6 +21,15 @@ const SingleServiceRequest = () => {
   const id = params.id as string;
 
   const { data, isPending, isError, error } = useSingleServiceRequest(id);
+
+  const { mutate: cancelOutage, isPending: cancelPending } =
+    useCancelServiceRequest(id);
+
+  const {
+    mutate,
+    isPending: statusPending,
+    isError: statusError,
+  } = useChangeStatusServiceRequest(id);
 
   if (isPending) {
     return (
@@ -35,7 +51,6 @@ const SingleServiceRequest = () => {
     );
   }
 
-  // API response: { success, message, data: { ...request } }
   const request = data?.data;
 
   if (!request) {
@@ -102,6 +117,14 @@ const SingleServiceRequest = () => {
     </section>
   );
 
+  const handleStatus = () => {
+    mutate();
+  };
+
+  const handleCancel = () => {
+    cancelOutage();
+  };
+
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-4 md:p-6">
       {/* Page Header */}
@@ -117,56 +140,36 @@ const SingleServiceRequest = () => {
 
       {/* Service Information */}
       <Section title="Service Information">
-        <Detail
-          label="Service Type"
-          value={formatLabel(request.type)}
-        />
+        <Detail label="Service Type" value={formatLabel(request.type)} />
 
         <Detail
           label="Description"
           value={request.description || "No description provided"}
         />
 
-        <Detail
-          label="Status"
-          value={formatLabel(request.status)}
-        />
+        <Detail label="Status" value={formatLabel(request.status)} />
 
         <Detail label="Request ID" value={request.id} />
 
-        <Detail
-          label="Account Number"
-          value={request.accountNumber}
-        />
+        <Detail label="Account Number" value={request.accountNumber} />
 
         <Detail label="User ID" value={request.userId} />
 
-        <Detail
-          label="Zone ID"
-          value={request.zoneId}
-        />
+        <Detail label="Zone ID" value={request.zoneId} />
 
         <Detail
           label="Technician ID"
           value={request.technicianId || "Technician not assigned yet"}
         />
 
-        <Detail
-          label="Created At"
-          value={formatDate(request.createdAt)}
-        />
+        <Detail label="Created At" value={formatDate(request.createdAt)} />
 
-        <Detail
-          label="Updated At"
-          value={formatDate(request.updatedAt)}
-        />
+        <Detail label="Updated At" value={formatDate(request.updatedAt)} />
 
         <Detail
           label="Deleted At"
           value={
-            request.deletedAt
-              ? formatDate(request.deletedAt)
-              : "Not deleted"
+            request.deletedAt ? formatDate(request.deletedAt) : "Not deleted"
           }
         />
       </Section>
@@ -194,15 +197,9 @@ const SingleServiceRequest = () => {
               value={request.user.phone || "Phone not available"}
             />
 
-            <Detail
-              label="Account Number"
-              value={request.user.accountNumber}
-            />
+            <Detail label="Account Number" value={request.user.accountNumber} />
 
-            <Detail
-              label="Customer ID"
-              value={request.user.id}
-            />
+            <Detail label="Customer ID" value={request.user.id} />
           </>
         )}
       </Section>
@@ -223,10 +220,7 @@ const SingleServiceRequest = () => {
 
             <Detail label="Location" value={request.zone.location} />
 
-            <Detail
-              label="Substation"
-              value={request.zone.substation}
-            />
+            <Detail label="Substation" value={request.zone.substation} />
 
             <Detail label="Feeder" value={request.zone.feeder} />
 
@@ -249,9 +243,7 @@ const SingleServiceRequest = () => {
       <Section title="Payment Information">
         {!request.payment ? (
           <div className="col-span-full rounded-lg border border-amber-200 bg-amber-50 p-4">
-            <p className="font-semibold text-amber-800">
-              Payment not yet.
-            </p>
+            <p className="font-semibold text-amber-800">Payment not yet.</p>
 
             <p className="mt-1 text-sm text-amber-700">
               No payment information is available for this service request.
@@ -273,25 +265,16 @@ const SingleServiceRequest = () => {
               }
             />
 
-            <Detail
-              label="Payment Method"
-              value={request.payment.provider}
-            />
+            <Detail label="Payment Method" value={request.payment.provider} />
 
             <Detail
               label="Transaction ID"
               value={request.payment.transactionId}
             />
 
-            <Detail
-              label="Payment ID"
-              value={request.payment.id}
-            />
+            <Detail label="Payment ID" value={request.payment.id} />
 
-            <Detail
-              label="Payment User ID"
-              value={request.payment.userId}
-            />
+            <Detail label="Payment User ID" value={request.payment.userId} />
 
             <Detail
               label="Payment Created At"
@@ -324,9 +307,7 @@ const SingleServiceRequest = () => {
           </div>
         ) : !request.technician ? (
           <div className="col-span-full rounded-lg border border-blue-200 bg-blue-50 p-4">
-            <p className="font-semibold text-blue-800">
-              Technician assigned.
-            </p>
+            <p className="font-semibold text-blue-800">Technician assigned.</p>
 
             <p className="mt-1 text-sm text-blue-700">
               Technician details are not available yet.
@@ -365,13 +346,53 @@ const SingleServiceRequest = () => {
               }
             />
 
-            <Detail
-              label="Technician ID"
-              value={request.technicianId}
-            />
+            <Detail label="Technician ID" value={request.technicianId} />
           </>
         )}
       </Section>
+
+      <div>
+        {!request ? (
+          <p>Loading service request...</p>
+        ) : request.status === "PENDING" ? (
+          <div className="flex gap-3">
+            <Button onClick={handleStatus} disabled={statusPending}>
+              {statusPending ? "Confirming..." : "Confirm Request"}
+            </Button>
+
+            <Button
+              variant="destructive"
+              onClick={handleCancel}
+              disabled={cancelPending || statusPending}
+            >
+              {cancelPending ? "Cancelling..." : "Cancel Service Request"}
+            </Button>
+          </div>
+        ) : request.status === "CONFIRMED" &&
+          request.payment?.status !== "PAID" ? (
+          <div className="space-y-3">
+            <p className="text-green-600 font-medium">
+              Service request confirmed. Please wait for payment.
+            </p>
+
+           
+          </div>
+        ) : request.payment?.status === "PAID" &&
+          request.status === "CONFIRMED" ? (
+          <div className="flex gap-3">
+            <AssignTechnicianServiceModal id={request.id} />
+
+          </div>
+        ) : request.status === "COMPLETED" ? (
+          <h1 className="text-green-600">Already completed</h1>
+        ) : request.status === "CANCELLED" ? (
+          <h1 className="text-red-600">You cancelled this service request.</h1>
+        ) : 
+          request.status === "IN_PROGRESS" ? null : (
+          <p>This service Request In Progress</p>
+        )}
+      </div>
+      {/* <div>{request.payment.status}</div> */}
     </div>
   );
 };

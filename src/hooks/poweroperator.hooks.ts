@@ -1,6 +1,9 @@
 import { assigneTechnician } from "@/app/(dashboard)/(PowerOperatoor)/_action/assignTechnician";
+import { assigneTechnicianServiceRequest } from "@/app/(dashboard)/(PowerOperatoor)/_action/assignTechnicianService";
 import { cancelOutageComplain } from "@/app/(dashboard)/(PowerOperatoor)/_action/cancelOutageComplain";
+import { cancelServiceRequestn } from "@/app/(dashboard)/(PowerOperatoor)/_action/cancelServiceRequest";
 import { updatOutageStatusComplain } from "@/app/(dashboard)/(PowerOperatoor)/_action/changeStatusComplainOutage";
+import { updatOutageStatusServiceRequest } from "@/app/(dashboard)/(PowerOperatoor)/_action/changleStatusServiceRequest";
 import { createSchedule } from "@/app/(dashboard)/(PowerOperatoor)/_action/createSchedule";
 import { createZone } from "@/app/(dashboard)/(PowerOperatoor)/_action/createZone";
 import { deleteShdedule } from "@/app/(dashboard)/(PowerOperatoor)/_action/deleteSchedule";
@@ -238,5 +241,75 @@ export function useSingleServiceRequest(id: string) {
     staleTime: 10 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     enabled: !!id,
+  });
+}
+
+
+
+
+
+export function useAssigneTechnicianServiceRequest(id: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (technicianId: string) =>
+      assigneTechnicianServiceRequest(id, technicianId),
+
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["servicerequest", id],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["servicerequest"],
+        }),
+      ]);
+    },
+
+  });
+}
+
+
+
+export function useChangeStatusServiceRequest(id: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () =>
+      updatOutageStatusServiceRequest(id),
+
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["servicerequest", id],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["servicerequest"],
+        }),
+      ]);
+    },
+
+  });
+}
+
+
+export function useCancelServiceRequest(id: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () =>
+      cancelServiceRequestn(id),
+
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["servicerequest", id],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["servicerequest"],
+        }),
+      ]);
+    },
+
   });
 }
