@@ -1,6 +1,6 @@
 
 import { ReactNode } from "react";
-import AdminSidebar from "./_component/adminSideNav";
+import AdminSideNavbar from "./_component/adminSideNav";
 
 
 
@@ -14,7 +14,7 @@ export default function ProfileLayout({
     <div className="flex min-h-screen flex-col md:flex-row">
       {/* Sidebar */}
       <aside className="w-full shrink-0 border-b border-gray-200 bg-white md:min-h-screen md:w-56 md:border-b-0 md:border-r lg:w-64">
-       <AdminSidebar></AdminSidebar>
+        <AdminSideNavbar></AdminSideNavbar>
       </aside>
 
       {/* Main Content */}
