@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from "react";
@@ -10,20 +11,36 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useGetAllUsers } from "../../../../hooks/admin.hooks";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 const PAGE_SIZE = 10;
 
+type User = {
+  id: string;
+  name?: string;
+  email?: string;
+  role?: string;
+  status?: string;
+};
+
 const Allusers = () => {
   const { data, isPending, isError } = useGetAllUsers();
+  const router = useRouter();
 
   const [search, setSearch] = React.useState("");
   const [currentPage, setCurrentPage] = React.useState(1);
 
   // API response: data.data.data
-  const users = data?.data?.data ?? [];
+  const users: User[] = data?.data?.data ?? [];
 
-  // Search all users returned by the API
-  const filteredUsers = users.filter((user: any) => {
+  // Exclude deleted users from the entire list
+  const visibleUsers = users.filter(
+    (user) => user.status?.toUpperCase() !== "DELETED"
+  );
+
+  // Search only non-deleted users
+  const filteredUsers = visibleUsers.filter((user) => {
     const query = search.trim().toLowerCase();
 
     return (
@@ -34,17 +51,22 @@ const Allusers = () => {
     );
   });
 
-  // Reset to page 1 when search changes
-
-  // Calculate pagination
+  // Pagination
   const totalUsers = filteredUsers.length;
   const totalPages = Math.ceil(totalUsers / PAGE_SIZE);
+
+  // Keep current page valid when results change
+  React.useEffect(() => {
+    setCurrentPage((page) =>
+      Math.max(1, Math.min(page, Math.max(1, totalPages)))
+    );
+  }, [totalPages]);
 
   const startIndex = (currentPage - 1) * PAGE_SIZE;
 
   const paginatedUsers = filteredUsers.slice(
     startIndex,
-    startIndex + PAGE_SIZE,
+    startIndex + PAGE_SIZE
   );
 
   const getRoleStyle = (role: string) => {
@@ -68,22 +90,23 @@ const Allusers = () => {
   };
 
   const getStatusStyle = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "active":
+    switch (status.toUpperCase()) {
+      case "ACTIVE":
         return "bg-emerald-50 text-emerald-700";
 
-      case "blocked":
+      case "BLOCKED":
         return "bg-red-50 text-red-700";
 
-      case "deleted":
-        return "bg-slate-100 text-slate-600";
-
-      case "inactive":
+      case "INACTIVE":
         return "bg-amber-50 text-amber-700";
 
       default:
         return "bg-slate-100 text-slate-600";
     }
+  };
+
+  const handleSingleCard = (id: string) => {
+    router.push(`/admin-dashboard/all-users/${id}`);
   };
 
   if (isPending) {
@@ -127,8 +150,9 @@ const Allusers = () => {
 
           <div>
             <p className="text-xs text-slate-500">Total Users</p>
-
-            <p className="text-xl font-bold text-slate-900">{users.length}</p>
+            <p className="text-xl font-bold text-slate-900">
+              {visibleUsers.length}
+            </p>
           </div>
         </div>
       </div>
@@ -175,16 +199,20 @@ const Allusers = () => {
                 <th className="px-6 py-4 font-semibold">Email</th>
                 <th className="px-6 py-4 font-semibold">Role</th>
                 <th className="px-6 py-4 font-semibold">Status</th>
+                <th className="px-6 py-4 font-semibold">Details</th>
               </tr>
             </thead>
 
             <tbody className="divide-y divide-slate-100">
-              {paginatedUsers.map((user: any) => {
-                const role = String(user.role ?? "N/A");
-                const status = String(user.status ?? "Unknown");
+              {paginatedUsers.map((user) => {
+                const role = user.role ?? "N/A";
+                const status = user.status ?? "Unknown";
 
                 return (
-                  <tr key={user.id} className="transition hover:bg-slate-50/80">
+                  <tr
+                    key={user.id}
+                    className="transition hover:bg-slate-50/80"
+                  >
                     {/* Name */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -207,7 +235,10 @@ const Allusers = () => {
                     {/* Email */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-sm text-slate-600">
-                        <Mail size={15} className="shrink-0 text-slate-400" />
+                        <Mail
+                          size={15}
+                          className="shrink-0 text-slate-400"
+                        />
                         {user.email || "N/A"}
                       </div>
                     </td>
@@ -218,20 +249,28 @@ const Allusers = () => {
                         className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold capitalize ${getRoleStyle(role)}`}
                       >
                         <ShieldCheck size={14} />
-
                         {role.replace(/_/g, " ").toLowerCase()}
                       </span>
                     </td>
 
-                    {/* Status */}
+                    {/* Status: DELETED users are filtered out above */}
                     <td className="px-6 py-4">
                       <span
                         className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold capitalize ${getStatusStyle(status)}`}
                       >
                         <span className="h-1.5 w-1.5 rounded-full bg-current" />
-
                         {status.replace(/_/g, " ").toLowerCase()}
                       </span>
+                    </td>
+
+                    {/* Details */}
+                    <td className="px-6 py-4">
+                      <Button
+                        type="button"
+                        onClick={() => handleSingleCard(user.id)}
+                      >
+                        Details
+                      </Button>
                     </td>
                   </tr>
                 );
@@ -239,7 +278,7 @@ const Allusers = () => {
 
               {paginatedUsers.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-6 py-16 text-center">
+                  <td colSpan={5} className="px-6 py-16 text-center">
                     <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
                       <Users size={24} />
                     </div>
@@ -268,15 +307,19 @@ const Allusers = () => {
               {Math.min(startIndex + PAGE_SIZE, totalUsers)}
             </span>{" "}
             of{" "}
-            <span className="font-semibold text-slate-800">{totalUsers}</span>{" "}
+            <span className="font-semibold text-slate-800">
+              {totalUsers}
+            </span>{" "}
             users
           </p>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {/* Previous */}
             <button
               type="button"
-              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+              onClick={() =>
+                setCurrentPage((prev) => Math.max(1, prev - 1))
+              }
               disabled={currentPage === 1 || totalPages === 0}
               className="flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
             >
@@ -291,6 +334,7 @@ const Allusers = () => {
                   key={page}
                   type="button"
                   onClick={() => setCurrentPage(page)}
+                  aria-current={currentPage === page ? "page" : undefined}
                   className={`h-9 min-w-9 rounded-lg px-3 text-sm font-semibold transition ${
                     currentPage === page
                       ? "bg-blue-600 text-white shadow-sm"
@@ -299,16 +343,20 @@ const Allusers = () => {
                 >
                   {page}
                 </button>
-              ),
+              )
             )}
 
             {/* Next */}
             <button
               type="button"
               onClick={() =>
-                setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                setCurrentPage((prev) =>
+                  Math.min(totalPages, prev + 1)
+                )
               }
-              disabled={currentPage === totalPages || totalPages === 0}
+              disabled={
+                currentPage === totalPages || totalPages === 0
+              }
               className="flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <span>Next</span>
