@@ -21,6 +21,11 @@ const menuItems = [
     href: "/admin-dashboard/",
     icon: CalendarDays,
   },
+   {
+    name: "Create staff",
+    href: "/admin-dashboard/create-staff",
+    icon: CalendarDays,
+  },
   {
     name: "All users",
     href: "/admin-dashboard/all-users",

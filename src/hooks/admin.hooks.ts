@@ -1,7 +1,9 @@
+import { createStaff, CreateStaffPayload } from "@/app/(dashboard)/(admin)/_action/createStaff";
 import { getAllReportAdmin } from "@/app/(dashboard)/(admin)/_action/getAdminAllReport";
 import { getAllAuditLogs } from "@/app/(dashboard)/(admin)/_action/getAllAuditLogs";
 import { getAllUsers } from "@/app/(dashboard)/(admin)/_action/getAllusers";
-import { useQuery } from "@tanstack/react-query";
+import { CreateStaffForm } from "@/app/(dashboard)/(admin)/_component/CreateStaffForm";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 
 export function useGetAllReport() {
@@ -22,6 +24,22 @@ export function useGetAllAuditLogs(page: number = 1) {
     staleTime: 10 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
+}
+
+
+export function useCreateStaff() {
+const queryClient = useQueryClient();
+
+return useMutation({
+mutationFn: (payload: CreateStaffPayload) => createStaff(payload),
+
+onSuccess: () => {
+  queryClient.invalidateQueries({
+    queryKey: ["adminallusers"],
+  });
+},
+
+});
 }
 
 
