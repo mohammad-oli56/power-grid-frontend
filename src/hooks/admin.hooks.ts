@@ -15,11 +15,10 @@ export function useGetAllReport() {
 }
 
 
-export function useGetAllAuditLogs() {
+export function useGetAllAuditLogs(page: number = 1) {
   return useQuery({
-    queryKey: ["adminauditlogs"],
-    queryFn: getAllAuditLogs,
-
+    queryKey: ["adminauditlogs", page],
+    queryFn: () => getAllAuditLogs(page, 10),
     staleTime: 10 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
