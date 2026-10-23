@@ -1,9 +1,10 @@
-import React from 'react'
+import PowerOperatorHome from "../_conponent/PowerOperatorHome"
+
 
 const page = () => {
   return (
     <div>
-      this power perator
+     <PowerOperatorHome></PowerOperatorHome>
     </div>
   )
 }

@@ -12,46 +12,75 @@ import {
   LogOut,
   Menu,
   X,
+  House,
+  MapPinPlus,
+  MapPinned,
+  HardHat,
+  CalendarPlus,
+  
+  Zap,
+  ClipboardCheck,
 } from "lucide-react";
 import { logout } from "@/service/logout";
 
+
 const menuItems = [
+  {
+    name: "Home",
+    href: "/power-operator-dashboard/",
+    icon: House,
+    color: "text-blue-600",
+    bg: "bg-blue-50",
+  },
   {
     name: "Create Zone",
     href: "/power-operator-dashboard/create-zone",
-    icon: CalendarDays,
+    icon: MapPinPlus,
+    color: "text-emerald-600",
+    bg: "bg-emerald-50",
   },
   {
     name: "Zones",
     href: "/power-operator-dashboard/zones",
-    icon: Wrench,
+    icon: MapPinned,
+    color: "text-blue-600",
+    bg: "bg-blue-50",
   },
   {
     name: "Technicians",
     href: "/power-operator-dashboard/technicians",
-    icon: Bell,
+    icon: HardHat,
+    color: "text-violet-600",
+    bg: "bg-violet-50",
   },
-   {
+  {
     name: "Create Schedule",
     href: "/power-operator-dashboard/create-schedule",
-    icon: Bell,
+    icon: CalendarPlus,
+    color: "text-orange-600",
+    bg: "bg-orange-50",
   },
   {
     name: "Schedule",
     href: "/power-operator-dashboard/schedules",
-    icon: Bell,
+    icon: CalendarDays,
+    color: "text-sky-600",
+    bg: "bg-sky-50",
   },
   {
-    name: "Outage Complains",
+    name: "Outage Complaints",
     href: "/power-operator-dashboard/outage-complains",
-    icon: Bell,
+    icon: Zap,
+    color: "text-rose-600",
+    bg: "bg-rose-50",
   },
-   {
-    name: "Service request",
+  {
+    name: "Service Requests",
     href: "/power-operator-dashboard/services-request",
-    icon: Bell,
+    icon: ClipboardCheck,
+    color: "text-emerald-600",
+    bg: "bg-emerald-50",
   },
-
 ];
 
 export default function PoweroperatorSidebar() {
