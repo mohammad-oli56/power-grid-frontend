@@ -1,9 +1,10 @@
 import React from 'react'
+import ServiceRequestCreateFrom from '../../_Components/ServiceRequestCreateFrom'
 
 const page = () => {
   return (
     <div>
-      this service-request
+     <ServiceRequestCreateFrom></ServiceRequestCreateFrom>
     </div>
   )
 }

@@ -1,9 +1,10 @@
 import React from 'react'
+import AllServiceRequest from '../../_Components/AllServiceRequest'
 
 const page = () => {
   return (
     <div>
-      this my service request
+     <AllServiceRequest></AllServiceRequest>
     </div>
   )
 }

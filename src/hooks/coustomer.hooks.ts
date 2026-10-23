@@ -2,8 +2,10 @@
 
 import { cancelOutageCoustomer } from "@/app/(dashboard)/(coustomer)/_action/cancelOutage";
 import { createOutage } from "@/app/(dashboard)/(coustomer)/_action/createOutage";
+import { createServiceRequest } from "@/app/(dashboard)/(coustomer)/_action/createServiceRequest";
 import { getAllNotification } from "@/app/(dashboard)/(coustomer)/_action/getAllNotification";
 import { getAllschedule } from "@/app/(dashboard)/(coustomer)/_action/getAllSchedule";
+import { getAllServiceRequestCoustomer } from "@/app/(dashboard)/(coustomer)/_action/getAllServiceRequest";
 import { getAllZone } from "@/app/(dashboard)/(coustomer)/_action/getAllZone";
 import { getAllOutageCoustomer } from "@/app/(dashboard)/(coustomer)/_action/getAlOutage";
 import { getAllSingleOutageCoustomer } from "@/app/(dashboard)/(coustomer)/_action/getSingleOutage";
@@ -88,4 +90,34 @@ onError: (error) => {
 },
 
 });
+}
+
+
+
+export function useCreateServiceRequest() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createServiceRequest,
+
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["serviceRequestData"],
+        }),
+      ]);
+    },
+
+    onError: (error) => {
+      console.error("Failed to create service request:", error.message);
+    },
+  });
+}
+
+
+export function useGetAllServiceRequest() {
+  return useQuery({
+   queryKey: ["serviceRequestData"],
+    queryFn: getAllServiceRequestCoustomer,
+  });
 }
