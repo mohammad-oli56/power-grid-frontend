@@ -23,7 +23,7 @@ const menuItems = [
   },
   {
     name: "Reset Password",
-    href: "/profile/reset-password",
+    href: "profile/reset-password",
     icon: KeyRound,
   },
   {
