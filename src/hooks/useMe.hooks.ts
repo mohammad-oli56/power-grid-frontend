@@ -1,6 +1,7 @@
 "use client";
 
 import { updateprofile } from "@/app/(profile)/_action/updateprofile";
+import { updateprofileImage } from "@/app/(profile)/_action/uploadimage";
 import { getMe } from "@/service/getMe";
 import {
   useMutation,
@@ -22,6 +23,23 @@ export function useUpdate() {
     mutationFn: updateprofile,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["me"] });
+    },
+  });
+}
+
+
+export function useUpdateImage() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateprofileImage,
+
+    onSuccess: async (result) => {
+      if (result.success) {
+        await queryClient.invalidateQueries({
+          queryKey: ["me"],
+        });
+      }
     },
   });
 }
