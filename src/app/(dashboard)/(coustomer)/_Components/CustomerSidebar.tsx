@@ -20,7 +20,7 @@ const menuItems = [
   { name: "Schedule", href: "/coustomer-dashboard/schedule", icon: CalendarDays },
   { name: "Create Outage", href: "/coustomer-dashboard/create-outage", icon: Zap },
    { name: "My Outage", href: "/coustomer-dashboard/my-outages", icon: Zap },
-  { name: "Payment", href: "/coustomer-dashboard/payment", icon: CreditCard },
+  { name: "Payment History", href: "/coustomer-dashboard/payment", icon: CreditCard },
   { name: "Create Service Request", href: "/coustomer-dashboard/service-request", icon: Wrench },
   { name: "My Service Request", href: "/coustomer-dashboard/my-service-request", icon: ClipboardList },
   { name: "Notification", href: "/coustomer-dashboard/notification", icon: Bell },

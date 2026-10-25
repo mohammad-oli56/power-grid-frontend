@@ -34,6 +34,7 @@ export default function Queryprividers ({children}:{children:ReactNode}){
     const queryclient = getQueryClient()
 
     return(
+        
         <QueryClientProvider client={queryclient}>
             {children}
         </QueryClientProvider>

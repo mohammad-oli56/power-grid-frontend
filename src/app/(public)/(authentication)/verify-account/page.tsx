@@ -125,19 +125,7 @@ const VerifyAccount = () => {
                 : "Verify OTP"}
             </Button>
 
-            <p className="text-center text-sm text-gray-500">
-              Didn't receive the OTP?{" "}
-
-              <button
-                type="button"
-                className="font-semibold text-blue-600 hover:underline"
-                onClick={() => {
-                  // Resend OTP will be implemented separately
-                }}
-              >
-                Resend OTP
-              </button>
-            </p>
+           
           </CardFooter>
         </form>
       </Card>

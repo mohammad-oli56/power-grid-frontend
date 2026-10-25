@@ -1,9 +1,10 @@
 import React from 'react'
+import PaymentHistory from '../../_Components/PaymentHistory'
 
 const page = () => {
   return (
     <div>
-      this payment
+      <PaymentHistory></PaymentHistory>
     </div>
   )
 }

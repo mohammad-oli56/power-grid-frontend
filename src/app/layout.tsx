@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import Prividers from "@/providers";
 import { Toaster } from "@/components/ui/toast";
+import GoogleAuthProvider from "@/providers/googleauth.provider";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
@@ -28,10 +29,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
     >
+      <GoogleAuthProvider>
       <Prividers>
       <body className="min-h-full flex flex-col">{children}</body>
       <Toaster />
       </Prividers>
+      </GoogleAuthProvider>
     </html>
   );
 }

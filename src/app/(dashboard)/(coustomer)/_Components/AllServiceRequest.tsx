@@ -1,10 +1,13 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useGetAllServiceRequest } from "@/hooks/coustomer.hooks";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 const AllServiceRequest = () => {
   const { data, isPending, isError } = useGetAllServiceRequest();
+  const router = useRouter();
 
   if (isPending) {
     return (
@@ -61,6 +64,11 @@ const AllServiceRequest = () => {
     }
   };
 
+
+   const handleSingleCard = (id: string) => {
+    router.push(`/coustomer-dashboard/my-service-request/${id}`);
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -93,6 +101,9 @@ const AllServiceRequest = () => {
                   </th>
                   <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
                     Created At
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    Details
                   </th>
                 </tr>
               </thead>
@@ -131,6 +142,14 @@ const AllServiceRequest = () => {
                       <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
                         {formatDate(request.createdAt)}
                       </td>
+                      <td className="px-6 py-4">
+                      <Button
+                        type="button"
+                        onClick={() => handleSingleCard(request.id)}
+                      >
+                        Details
+                      </Button>
+                    </td>
                     </tr>
                   )
                 )}
