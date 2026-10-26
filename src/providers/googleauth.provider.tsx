@@ -9,15 +9,18 @@ export default function GoogleAuthProvider({
 }: {
   children: ReactNode;
 }) {
-  // const clientId = 385201233796-t2jreupa3lugje7t4atpvsbq29hs4rct.apps.googleusercontent.com
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
-  // if (!clientId) {
-  //   console.error("Missing NEXT_PUBLIC_GOOGLE_CLIENT_ID");
-  //   return <>{children}</>;
-  // }
+  if (!clientId) {
+    console.error(
+      "Missing NEXT_PUBLIC_GOOGLE_CLIENT_ID in .env"
+    );
+
+    return <>{children}</>;
+  }
 
   return (
-    <GoogleOAuthProvider clientId="385201233796-t2jreupa3lugje7t4atpvsbq29hs4rct.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId={clientId}>
       {children}
     </GoogleOAuthProvider>
   );

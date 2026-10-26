@@ -22,6 +22,11 @@ import {
   FormState,
   registerAction,
 } from "../_action/RegisterAction";
+import { useGoogle } from "@/hooks/useMe.hooks";
+import { toast } from "@/components/ui/toast";
+import { Field, FieldDescription } from "@/components/ui/field";
+import { GoogleLogin } from "@react-oauth/google";
+import Link from "next/link";
 
 const initialState: FormState = {
   success: false,
@@ -34,7 +39,7 @@ const RegisterPage = () => {
 
   const [state, formAction, isPending] =
     useActionState(registerAction, initialState);
-
+  const { mutate: googleLogin } = useGoogle();
   useEffect(() => {
     if (state.success && state.email) {
       const timer = setTimeout(() => {
@@ -46,6 +51,44 @@ const RegisterPage = () => {
       return () => clearTimeout(timer);
     }
   }, [state.success, state.email, router]);
+
+  
+  const handleGoogleSuccess = (credentialResponse: { credential?: string }) => {
+    const idToken = credentialResponse.credential;
+    console.log(idToken);
+    if (!idToken) {
+      toast.add({
+        title: "Google OAuth failed",
+        description: "Something went wrong. Please try again.",
+      });
+      return;
+    }
+
+    googleLogin(idToken, {
+      onSuccess: () => {
+        toast.add({
+          type: "success",
+          description: "google login successfull ",
+        });
+        router.push("/")
+      },
+      onError: () => {
+        toast.add({
+          title: "Google OAuth failed",
+          description: "Something went wrong. Please try again.333",
+        });
+      },
+    });
+  };
+
+  const handelGoogleError = () => {
+    toast.add({
+      title: "google oauth faied",
+      description: "somethisn wen wron .plest try again",
+    });
+    return;
+  };
+
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 py-10">
@@ -59,14 +102,7 @@ const RegisterPage = () => {
             Enter your information below to create your account.
           </CardDescription>
 
-          <CardAction>
-            <Button
-              variant="outline"
-              onClick={() => router.push("/login")}
-            >
-              Login
-            </Button>
-          </CardAction>
+       
         </CardHeader>
 
         <form action={formAction}>
@@ -102,24 +138,7 @@ const RegisterPage = () => {
               />
             </div>
 
-            {/* Phone */}
-            <div className="grid gap-2">
-              <Label htmlFor="phoneNumber">
-                Phone Number
-                <span className="text-gray-500 text-sm">
-                  {" "}
-                  (Optional)
-                </span>
-              </Label>
-
-              <Input
-                id="phoneNumber"
-                name="phoneNumber"
-                type="text"
-                placeholder="01XXXXXXXXX"
-                pattern="^01[3-9]\d{8}$"
-              />
-            </div>
+           
 
             {/* Password */}
             <div className="grid gap-2">
@@ -174,6 +193,14 @@ const RegisterPage = () => {
             </p>
           </CardFooter>
         </form>
+        <Field>
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handelGoogleError}
+          ></GoogleLogin>
+
+        
+        </Field>
       </Card>
     </div>
   );

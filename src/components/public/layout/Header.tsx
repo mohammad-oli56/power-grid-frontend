@@ -10,7 +10,7 @@ const Header = async () => {
 // console.log(user.data)
   const routes = [
     { name: "Home", url: "/" },
-    { name: "Features", url: "/features" },
+    { name: "Features", url: "/future" },
     { name: "About", url: "/about" },
     { name: "Contact", url: "/contact" },
   ];

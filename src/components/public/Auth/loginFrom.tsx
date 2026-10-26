@@ -8,6 +8,7 @@ import { Eye, EyeOff, Loader2, LogIn } from "lucide-react";
 
 import {
   Field,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -19,6 +20,9 @@ import { Separator } from "@/components/ui/separator";
 import { useLogin } from "@/hooks/auth.hooks";
 import { Input } from "@base-ui/react";
 import { useRouter } from "next/navigation";
+import { useGoogle } from "@/hooks/useMe.hooks";
+import { toast } from "@/components/ui/toast";
+import { GoogleLogin } from "@react-oauth/google";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -26,6 +30,7 @@ export default function LoginForm() {
   const router = useRouter()
 
   const { mutate: login, isPending: loginPending } = useLogin();
+  const { mutate: googleLogin } = useGoogle();
 
   const form = useForm({
     defaultValues: {
@@ -63,6 +68,42 @@ export default function LoginForm() {
       });
     },
   });
+
+
+  const handleGoogleSuccess = (credentialResponse: { credential?: string }) => {
+    const idToken = credentialResponse.credential;
+    console.log(idToken);
+    if (!idToken) {
+      toast.add({
+        title: "Google OAuth failed",
+        description: "Something went wrong. Please try again.",
+      });
+      return;
+    }
+
+    googleLogin(idToken, {
+      onSuccess: () => {
+        toast.add({
+          type: "success",
+          description: "google login successfull ",
+        });
+      },
+      onError: () => {
+        toast.add({
+          title: "Google OAuth failed",
+          description: "Something went wrong. Please try again.333",
+        });
+      },
+    });
+  };
+
+  const handelGoogleError = () => {
+    toast.add({
+      title: "google oauth faied",
+      description: "somethisn wen wron .plest try again",
+    });
+    return;
+  };
 
   return (
     <div className="mx-auto w-full max-w-md">
@@ -265,6 +306,20 @@ export default function LoginForm() {
           </Link>
         </Button>
       </div>
+
+       <Field>
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handelGoogleError}
+          ></GoogleLogin>
+
+          <FieldDescription className="px-6 text-center">
+            Already have an account?{" "}
+            <Link href="/login" className="underline">
+              Sign in
+            </Link>
+          </FieldDescription>
+        </Field>
 
       {/* Terms */}
       <p className="mt-6 text-center text-xs leading-relaxed text-muted-foreground">

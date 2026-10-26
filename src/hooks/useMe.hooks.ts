@@ -2,7 +2,9 @@
 
 import { updateprofile } from "@/app/(profile)/_action/updateprofile";
 import { updateprofileImage } from "@/app/(profile)/_action/uploadimage";
+import { googleaccount } from "@/app/(public)/(authentication)/_action/google.auth";
 import { getMe } from "@/service/getMe";
+import { logout } from "@/service/logout";
 import {
   useMutation,
   useQuery,
@@ -40,6 +42,26 @@ export function useUpdateImage() {
           queryKey: ["me"],
         });
       }
+    },
+  });
+}
+
+
+export function useGoogle() {
+  return useMutation({
+    mutationFn: googleaccount
+  })
+} 
+
+
+export function useLogout() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: logout,
+    onSuccess: async () => {
+      // Clear all React Query cache
+      queryClient.clear();
     },
   });
 }

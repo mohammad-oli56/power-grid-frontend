@@ -17,8 +17,7 @@ export const registerAction = async (
     const name = formData.get("name")?.toString().trim() || "";
     const email =
       formData.get("email")?.toString().trim().toLowerCase() || "";
-    const phoneNumber =
-      formData.get("phoneNumber")?.toString().trim() || "";
+ 
     const password = formData.get("password")?.toString() || "";
 
     // -----------------------------
@@ -60,17 +59,7 @@ export const registerAction = async (
       };
     }
 
-    if (phoneNumber) {
-      const phoneRegex = /^01[3-9]\d{8}$/;
-
-      if (!phoneRegex.test(phoneNumber)) {
-        return {
-          success: false,
-          message: "Invalid Bangladesh phone number.",
-          email,
-        };
-      }
-    }
+   
 
     // -----------------------------
     // API Request
@@ -82,7 +71,7 @@ export const registerAction = async (
         name,
         email,
         password,
-        phoneNumber,
+        
       },
       {
         headers: {

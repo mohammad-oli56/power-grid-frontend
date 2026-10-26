@@ -18,6 +18,11 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { loginAction } from "../_action/AuthAction";
 import { Input } from "@base-ui/react";
+import { useGoogle } from "@/hooks/useMe.hooks";
+import { toast } from "@/components/ui/toast";
+import { Field, FieldDescription } from "@/components/ui/field";
+import { GoogleLogin } from "@react-oauth/google";
+import Link from "next/link";
 
 const initialState = {
   success: false,
@@ -28,6 +33,44 @@ export default function Page() {
   const router = useRouter();
 
   const [state, action, pending] = useActionState(loginAction, initialState);
+  const { mutate: googleLogin } = useGoogle();
+
+    
+  const handleGoogleSuccess = (credentialResponse: { credential?: string }) => {
+    const idToken = credentialResponse.credential;
+    console.log(idToken);
+    if (!idToken) {
+      toast.add({
+        title: "Google OAuth failed",
+        description: "Something went wrong. Please try again.",
+      });
+      return;
+    }
+
+    googleLogin(idToken, {
+      onSuccess: () => {
+        toast.add({
+          type: "success",
+          description: "google login successfull ",
+        });
+        router.push("/")
+      },
+      onError: () => {
+        toast.add({
+          title: "Google OAuth failed",
+          description: "Something went wrong. Please try again.333",
+        });
+      },
+    });
+  };
+
+  const handelGoogleError = () => {
+    toast.add({
+      title: "google oauth faied",
+      description: "somethisn wen wron .plest try again",
+    });
+    return;
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center">
@@ -88,6 +131,14 @@ export default function Page() {
             )}
           </CardFooter>
         </form>
+        <Field>
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handelGoogleError}
+          ></GoogleLogin>
+
+         
+        </Field>
       </Card>
     </div>
   );

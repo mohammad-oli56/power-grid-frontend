@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server'
 
 
 const AUTH_ROUTE = ["/login", "/register","/verify-account"]
-const PUBLIC_ROUTE = ["/", "/about", "/login", "/register", "/property", "/about", "/contact","/verify-account"]
+const PUBLIC_ROUTE = ["/", "/login", "/register", "/future", "/about", "/contact","/verify-account"]
 
 
 export function proxy(request: NextRequest) {
